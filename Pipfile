@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+flask-marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+passlib = "*"
+flask-httpauth = "*"
+itsdangerous = "*"
+flask-mail = "*"
+beautifulsoup4 = "*"
+requests = "*"
+spacy = "*"
+
+[requires]
+python_version = "3.8"
