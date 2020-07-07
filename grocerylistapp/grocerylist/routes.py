@@ -5,6 +5,7 @@ from grocerylistapp.models import GroceryList, Recipe, recipe_list_associations
 from grocerylistapp.utils import get_resource_or_404, post_new_resource, put_resource
 
 from grocerylistapp.grocerylist.schemas import GroceryListSchema
+from grocerylistapp.grocerylist.utils import get_list_by_params
 from grocerylistapp.user.schemas import UserSchema
 from grocerylistapp.recipe.schemas import RecipeSchema
 
@@ -22,10 +23,8 @@ users_schema = UserSchema(many=True, exclude=("hashed_password",))
 # return list of GroceryLists, with optional filters
 @grocerylist.route("/lists", methods=["GET"])
 def get_lists():
-    # TODO: add checks for filters here
-
-    all_lists = GroceryList.query.all()
-    return jsonify(grocerylists_schema.dump(all_lists))
+    lists = get_list_by_params(request.args)
+    return jsonify(grocerylists_schema.dump(lists))
 
 
 # post a new GroceryList
