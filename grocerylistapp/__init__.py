@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_mail import Mail
 from flask_httpauth import HTTPBasicAuth
+from flask_cors import CORS
 
 import spacy
 
@@ -22,6 +23,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     ma.init_app(app)
     mail.init_app(app)
+    CORS(app)
 
     from grocerylistapp.ingredient.routes import ingredient
     app.register_blueprint(ingredient)

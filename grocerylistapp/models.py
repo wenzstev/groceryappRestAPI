@@ -182,6 +182,7 @@ class User(db.Model):
         s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id}).decode("utf-8")
 
+
     # verify a token
     @staticmethod
     def verify_auth_token(token):
@@ -189,8 +190,10 @@ class User(db.Model):
         try:
             data = s.loads(token)
         except SignatureExpired:
+            print("signature expired")
             return None  # valid token, expired
         except BadSignature:
+            print("invalid token")
             return None  # invalid token
 
         user = User.query.get(data['id'])

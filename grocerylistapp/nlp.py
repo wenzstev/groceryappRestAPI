@@ -15,6 +15,7 @@ def determine_ingredients_in_line(recipe_dict):
         line_nlp = nlp(line)
 
         for ent in line_nlp.ents:
+            print("entity:", ent)
             if (ent.label_ == "INGREDIENT"):
                 current_recipe_line["ingredients"].append({"name": ent.text})
         recipe_lines_with_ingredients.append(current_recipe_line)

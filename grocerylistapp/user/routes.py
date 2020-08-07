@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, request, jsonify, g, make_response
 
 from sqlalchemy.exc import IntegrityError
 
@@ -30,6 +30,7 @@ def get_users():
 # post a new user
 @user.route("/users", methods=["POST"])
 def post_user():
+    print(request.json)
     new_user = post_new_resource(User, request.json)
     return user_schema.dump(new_user)
 
@@ -73,10 +74,28 @@ def change_user_info(id_):
 
 # get a token for a user
 @user.route("/users/token")
-@auth.login_required
 def get_auth_token():
-    token = g.user.generate_auth_token()
-    return jsonify({'token': token.decode('ascii')})
+    refresh_token = request.cookies.get('refresh_token')
+    print(refresh_token)
+    if not refresh_token:
+        raise InvalidUsage("No refresh token", 404)
+    user = User.verify_auth_token(refresh_token)
+    access_token = user.generate_auth_token(expiration=300)
+    return jsonify({
+        'token': access_token,
+        'user': user_schema.dumps(user)
+    })
+
+
+# get a refresh token for a user
+@user.route("/users/refresh-token")
+@auth.login_required
+def get_refresh_token():
+    refresh_token = g.user.generate_auth_token(expiration=1209600)  # 14 days
+    response = make_response('', 204)
+    response.set_cookie('refresh_token', refresh_token, httponly=True)
+    return response
+
 
 
 # send a verification email
@@ -85,6 +104,7 @@ def send_verify_email():
     # not using decorator because email is not yet validated
     username = request.authorization["username"]
     password = request.authorization["password"]
+    print(username, password)
     verify_password(username, password, needs_valid_email=False)
 
     url_to_send = request.args.get("url")
@@ -98,10 +118,19 @@ def send_verify_email():
 @user.route("/users/verification", methods=["PUT"])
 def verify_email():
     print("verifying email")
-    token = request.json.get("token")
+    token = request.args.get("token")
+    print(token)
     user = User.verify_auth_token(token)
     if not user:
         raise InvalidUsage("Unable to get user from token.")
     user.email_validated = True
     db.session.commit()
     return jsonify(user_schema.dump(user))
+
+
+# log out user by deleting httpOnly refresh cookie
+@user.route('/users/logout')
+def logout_user():
+    response = make_response('', 204)
+    response.set_cookie('refresh_token', '', expires=0)
+    return response

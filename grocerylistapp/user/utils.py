@@ -11,7 +11,7 @@ def send_validate_email(user, route):
     token = user.generate_auth_token(expiration=2000)
     print("token:", token)
     msg = Message('Verify Your Email', sender='groceryapp@gmail.com', recipients=[user.email])
-    msg.body = f'''To verify your email, please visit this link: {route}/{token}.'''
+    msg.body = f'''To verify your email, please visit this link: {route}?token={token}.'''
     mail.send(msg)
 
     return token

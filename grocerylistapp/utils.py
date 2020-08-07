@@ -57,6 +57,7 @@ def load_resource_from_schema(resource_type, new_resource_json):
 
 
 def post_new_resource(resource_type, new_resource_json):
+    print("new resource", new_resource_json)
     new_resource = load_resource_from_schema(resource_type, new_resource_json)
 
     try:
