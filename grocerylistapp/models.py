@@ -9,7 +9,8 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSign
 # association table between RecipeLine and Ingredient models (many-to-many relationship)
 line_ingredient_associations = db.Table('line_ingredient_associations',
                                         db.Column('ingredient', db.Integer, db.ForeignKey('ingredient.id')),
-                                        db.Column('recipe_line', db.Integer, db.ForeignKey('recipe_line.id'))
+                                        db.Column('recipe_line', db.Integer, db.ForeignKey('recipe_line.id')),
+                                        db.Column('relevant_tokens', db.String)
                                         )
 
 # association table between Recipe and GroceryList models (many-to-many relationship)
