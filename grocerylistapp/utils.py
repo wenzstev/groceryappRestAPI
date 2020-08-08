@@ -48,9 +48,9 @@ def load_resource_from_schema(resource_type, new_resource_json):
         return new_resource
     except ValidationError as e:
         raise InvalidUsage("Your data was not formatted correctly.", payload=e.messages)
-    except IntegrityError:
-        raise InvalidUsage("Your data was not formatted correctly; you are trying to insert something int the database "
-                           "which already exists.")
+    except IntegrityError as e:
+        raise InvalidUsage("Your data was not formatted correctly; you are trying to insert something into the database "
+                           "which already exists.", payload=e)
     except FlushError:
         raise InvalidUsage("Your data was not formatted correctly; are you using an id which already exists?")
 

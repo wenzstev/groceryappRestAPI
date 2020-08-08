@@ -7,7 +7,8 @@ from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 
 # association table between RecipeLine and Ingredient models (many-to-many relationship)
-line_ingredient_associations = db.Table('line_ingredient_associations',
+# CURRENTLY UNUSED
+line_ingredient_associations = db.Table('line_ingredient_associations_UNUSED',
                                         db.Column('ingredient', db.Integer, db.ForeignKey('ingredient.id')),
                                         db.Column('recipe_line', db.Integer, db.ForeignKey('recipe_line.id')),
                                         db.Column('relevant_tokens', db.String)
@@ -28,22 +29,29 @@ user_list_associations = db.Table('user_list_associations',
                                   )
 
 
+# Represents an association between an ingredient and a recipe line
+class LineIngredientAssociations(db.Model):
+    __tablename__='line_ingredient_associations'
+    id_ = db.Column(db.Integer, primary_key=True)  # separate because ingredient could appear more than once in a line
+    ingredient_id = db.Column(db.ForeignKey('ingredient.id'))
+    recipeline_id = db.Column(db.ForeignKey('recipe_line.id'))
+    relevant_tokens = db.Column(db.String(), nullable=False)
+    ingredient = db.relationship("Ingredient", back_populates='recipe_lines')
+    recipe_line = db.relationship("RecipeLine", back_populates='ingredients')
+
+    # TODO: Create a validator to confirm that the ingredient is on the recipe line
+
+    def __repr__(self):
+        return f"<Association of {self.ingredient} with {self.recipe_line} at {self.relevant_tokens}>"
+
 # Represents an ingredient.
 class Ingredient(db.Model):
     __tablename__ = 'ingredient'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)    # the actual name of the ingredient
-    recipe_lines = db.relationship("RecipeLine",    # lines where this ingredient appears.
-                                   secondary=line_ingredient_associations,
-                                   back_populates='ingredients')
+    recipe_lines = db.relationship("LineIngredientAssociations",    # lines where this ingredient appears.
+                                   back_populates='ingredient')
 
-    # validator to ensure that an ingredient does not add a line that doesn't feature it
-    @db.validates('recipe_lines')
-    def validate_recipe_line(self, key, address):
-        print("in ingredient validator")
-        if self.name not in address.text:
-            raise ValueError("Ingredient not in line!")
-        return address
 
     # validator to ensure that an ingredient is in the proper form (all lower case, no dashes or other symbols)
     @db.validates('name')
@@ -71,22 +79,9 @@ class RecipeLine(db.Model):
     text = db.Column(db.String, nullable=False)  # the text of the line
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
     recipe = db.relationship("Recipe", back_populates="recipe_lines")
-    ingredients = db.relationship("Ingredient",
-                                  secondary=line_ingredient_associations,
-                                  back_populates="recipe_lines")
+    ingredients = db.relationship("LineIngredientAssociations",
+                                  back_populates="recipe_line")
 
-    @db.validates('ingredients')
-    def validate_ingredients(self, key, address):
-        print("validating ingredients in line")
-        print("key")
-        print(key)
-        print("address")
-        print(address)
-        print("key:", key, "address:", address)
-        print(self.text)
-        if address.name not in self.text.lower():
-            raise ValueError("Ingredient must be in the line")
-        return address
 
     def __hash__(self):
         return hash(self.id)
