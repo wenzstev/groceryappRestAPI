@@ -26,6 +26,14 @@ class RecipelineIngredientAssociationSchema(ma.SQLAlchemyAutoSchema):
         data["relevant_tokens"] = json.loads(data["relevant_tokens"])
         return data
 
+    @pre_load
+    def check_json(self, data, **kwargs):
+        print("preloaded data:", data)
+        # turn list into string
+        if isinstance(data["relevant_tokens"], list):
+            data["relevant_tokens"] = json.dumps(data["relevant_tokens"])
+        return data
+
 
 class RecipeLineSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

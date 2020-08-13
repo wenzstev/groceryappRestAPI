@@ -1,4 +1,4 @@
-from grocerylistapp.models import Ingredient, RecipeLine, Recipe, GroceryList
+from grocerylistapp.models import Ingredient, RecipeLine, Recipe, GroceryList, LineIngredientAssociations
 from grocerylistapp.errors.exceptions import InvalidUsage
 from grocerylistapp.utils import get_resource_or_404
 
@@ -13,7 +13,8 @@ def get_ingredient_by_params(args):
         for recipe_id in args.get("recipe"):
             set_to_return.update(
                 Ingredient.query
-                .join(RecipeLine, "recipe_lines")
+                .join(LineIngredientAssociations, "recipe_lines")
+                .join(RecipeLine)
                 .join(Recipe)
                 .filter(Recipe.id == recipe_id)
                 .all())

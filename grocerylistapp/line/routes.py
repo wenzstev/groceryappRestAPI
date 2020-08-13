@@ -7,13 +7,15 @@ from grocerylistapp.models import RecipeLine, Recipe
 from grocerylistapp.utils import get_resource_or_404, put_resource, post_new_resource
 from grocerylistapp.errors.exceptions import InvalidUsage
 
-from grocerylistapp.line.schemas import RecipeLineSchema
+from grocerylistapp.line.schemas import RecipeLineSchema, RecipelineIngredientAssociationSchema
+from grocerylistapp.line.utils import get_new_ingredients_on_line
 from grocerylistapp.ingredient.schemas import IngredientSchema
 
 line = Blueprint("line", __name__)
 recipeline_schema = RecipeLineSchema()
 recipelines_schema = RecipeLineSchema(many=True)
 ingredients_schema = IngredientSchema(many=True)
+recipeline_association_schema = RecipelineIngredientAssociationSchema(many=True)
 
 
 @line.route("/lines/<int:id_>", methods=['GET'])
@@ -32,7 +34,7 @@ def post_line():
     else:
         raise InvalidUsage("You don't have permission to modify that recipe.")
 
-
+# FIXME: this is currently broken after the changes to RecipeLines in the model
 @line.route("/lines/<int:id_>", methods=['PUT'])
 @auth.login_required
 def put_line(id_):
@@ -42,6 +44,24 @@ def put_line(id_):
         line_to_change.ingredients = ingredients_schema.load(request.json.get("ingredients", ""))
         db.session.commit()
         return jsonify(recipeline_schema.dump(line_to_change))
+    else:
+        raise InvalidUsage("You don't have permission to modify that line.", 401)
+
+
+@line.route('/lines/<int:id_>/ingredients', methods=['PUT'])
+@auth.login_required
+def change_ingredients_in_line(id_):
+    line_to_change = get_resource_or_404(RecipeLine, id_)
+    if g.user.id == line_to_change.recipe.creator_id:
+        new_ingredients_json = request.json.get("new_ingredients")
+        print(new_ingredients_json)
+        new_ingredients = get_new_ingredients_on_line(new_ingredients_json, line_to_change)
+        print(new_ingredients)
+        line_to_change.ingredients = recipeline_association_schema.loads(new_ingredients)
+        print(line_to_change)
+        db.session.commit()
+        return jsonify(recipeline_schema.dump(line_to_change))
+
     else:
         raise InvalidUsage("You don't have permission to modify that line.", 401)
 

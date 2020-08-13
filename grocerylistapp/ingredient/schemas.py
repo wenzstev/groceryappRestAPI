@@ -20,6 +20,7 @@ class IngredientSchema(ma.SQLAlchemyAutoSchema):
     @post_load
     def make_ingredient(self, data, **kwargs):
         print("in ingredient postload")
+        print(data)
         existing_ingredient = Ingredient.query.filter_by(name=data["name"]).first()
         if existing_ingredient:
             return existing_ingredient
