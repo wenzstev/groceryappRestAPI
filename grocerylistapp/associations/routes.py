@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, g
 
 from grocerylistapp import db, auth
 from grocerylistapp.models import recipe_list_associations, user_list_associations
-from grocerylistapp.associations.utils import load_list_and_check_permissions, get_association_or_404, add_association
+from grocerylistapp.associations.utils import load_list_and_check_permissions, get_association_or_404, add_association, get_associaton_by_params
 from grocerylistapp.associations.schemas import ListRecipeAssociationSchema, EditorAssociationSchema
 from grocerylistapp.errors.exceptions import NotFoundException, InvalidUsage
 
@@ -18,7 +18,7 @@ list_user_association_schema = EditorAssociationSchema()
 
 @associations.route("/list-recipe-associations", methods=["GET"])
 def get_list_recipe_associations():
-    return jsonify(list_recipes_associations_schema.dump(db.session.query(recipe_list_associations).all()))
+    return jsonify(list_recipes_associations_schema.dump(get_associaton_by_params(request.args)))
 
 
 @associations.route("/list-recipe-associations/<int:id_>", methods=["GET"])

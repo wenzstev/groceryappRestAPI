@@ -2,6 +2,16 @@ from flask import g, jsonify
 
 from grocerylistapp import db
 from grocerylistapp.errors.exceptions import InvalidUsage
+from grocerylistapp.models import recipe_list_associations, user_list_associations
+
+
+def get_associaton_by_params(param):
+    if param.get("recipe"):
+        return db.session.query(recipe_list_associations).filter(recipe_list_associations.c.recipe == param.get("recipe")).all()
+    if param.get("list"):
+        return db.session.query(recipe_list_associations).filter(recipe_list_associations.c.grocery_list == param.get("list")).all()
+    else:
+        return db.session.query(recipe_list_associations).all()
 
 
 def load_list_and_check_permissions(association_to_modify, association_schema):
