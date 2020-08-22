@@ -27,7 +27,7 @@ def get_specific_association(id_):
     return jsonify(list_recipes_association_schema.dump(current_association))
 
 
-@associations.route("/list-recipe-associations", methods=["PUT"])
+@associations.route("/list-recipe-associations", methods=["POST"])
 @auth.login_required
 def put_list_recipe_associations():
     list_to_modify, recipe_to_add = load_list_and_check_permissions(request.json, list_recipes_association_schema)
@@ -62,7 +62,7 @@ def get_specific_list_user_association(id_):
     return jsonify(list_user_association_schema.dump(specific_association))
 
 
-@associations.route("/list-user-associations", methods=["PUT"])
+@associations.route("/list-user-associations", methods=["POST"])
 @auth.login_required
 def post_list_user_association():
     list_to_modify, new_editor = load_list_and_check_permissions(request.json, list_user_association_schema)

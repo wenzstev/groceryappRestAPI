@@ -13,3 +13,5 @@ def get_list_by_params(args):
             .all()
         return user_lists
 
+    return GroceryList.query.all()
+

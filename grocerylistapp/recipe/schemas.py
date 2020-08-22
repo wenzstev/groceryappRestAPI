@@ -39,6 +39,10 @@ class RecipeSchema(ma.SQLAlchemyAutoSchema):
                 return recipe_from_url_with_ingredients
             except KeyError as e:
                 raise ValidationError(f"Missing data: {repr(e)}")
+
+        if not data.get('creator'):
+            data['creator_id'] = g.user.id
+        print(data)
         return data
 
     # create the Recipe object, or return the existing recipe object if it already exists

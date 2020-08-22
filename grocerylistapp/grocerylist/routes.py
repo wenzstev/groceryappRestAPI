@@ -9,7 +9,7 @@ from grocerylistapp.grocerylist.utils import get_list_by_params
 from grocerylistapp.user.schemas import UserSchema
 from grocerylistapp.recipe.schemas import RecipeSchema
 
-from grocerylistapp.errors.exceptions import InvalidUsage
+from grocerylistapp.errors.exceptions import InvalidUsage, NotFoundException
 
 grocerylist = Blueprint("grocerylist", __name__)
 
@@ -56,6 +56,24 @@ def modify_list(id_):
     else:
         raise InvalidUsage("You don't have permission to modify this list.", 401)
 
+
+# special route for accessing the "Additional Ingredients" recipe for a specific list
+@grocerylist.route("/lists/<int:id_>/additionalingredients", methods=['GET'])
+def get_additional_ingredients(id_):
+    list_to_get = get_resource_or_404(GroceryList, id_)
+    recipe_schema = RecipeSchema()
+
+
+    additional_ingredients = Recipe.query \
+        .join(GroceryList, "grocery_lists") \
+        .filter(GroceryList.id == list_to_get.id) \
+        .filter_by(name="Additional Ingredients")\
+        .first()
+
+    if additional_ingredients is None:
+        raise InvalidUsage("No additional ingredients found for this list. ", 404)
+
+    return jsonify(recipe_schema.dump(additional_ingredients))
 
 
 # set editors to a GroceryList

@@ -26,6 +26,9 @@ user_schema = UserSchema()
 @recipe.route("/recipes", methods=["GET"])
 def get_recipes():
     recipes = get_recipe_by_params(request.args)
+    print("loaded recipes")
+    print(recipes)
+    print(recipes_schema.dump(recipes))
     return jsonify(recipes_schema.dump(recipes))
 
 

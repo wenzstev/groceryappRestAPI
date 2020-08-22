@@ -25,7 +25,8 @@ def get_ingredient_by_params(args):
         for line_id in args.get("list"):
             set_to_return.update(
                 Ingredient.query
-                .join(RecipeLine, "recipe_lines")
+                .join(LineIngredientAssociations, "recipe_lines")
+                .join(RecipeLine)
                 .join(Recipe)
                 .join(GroceryList, Recipe.grocery_lists)
                 .filter(GroceryList.id == line_id)
