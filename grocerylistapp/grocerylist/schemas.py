@@ -66,6 +66,7 @@ class GroceryListSchema(ma.SQLAlchemyAutoSchema):
 
     @post_load
     def make_list(self, data, **kwargs):
+        print("making list", data)
         return GroceryList(**data)
 
 

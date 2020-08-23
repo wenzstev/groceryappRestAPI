@@ -34,6 +34,7 @@ def post_list():
     new_list_json = request.json
     new_list_json["creator_id"] = g.user.id
     new_grocerylist = post_new_resource(GroceryList, new_list_json)
+    new_grocerylist.create_additional_ingredients_recipe()
     return jsonify(grocerylist_schema.dump(new_grocerylist)), 201
 
 
@@ -62,18 +63,8 @@ def modify_list(id_):
 def get_additional_ingredients(id_):
     list_to_get = get_resource_or_404(GroceryList, id_)
     recipe_schema = RecipeSchema()
+    return jsonify(recipe_schema.dump(list_to_get.additional_ingredients))
 
-
-    additional_ingredients = Recipe.query \
-        .join(GroceryList, "grocery_lists") \
-        .filter(GroceryList.id == list_to_get.id) \
-        .filter_by(name="Additional Ingredients")\
-        .first()
-
-    if additional_ingredients is None:
-        raise InvalidUsage("No additional ingredients found for this list. ", 404)
-
-    return jsonify(recipe_schema.dump(additional_ingredients))
 
 
 # set editors to a GroceryList
@@ -94,12 +85,7 @@ def add_editors(id_):
 @grocerylist.route("/lists/<int:id_>", methods=["DELETE"])
 def delete_list(id_):
     list_to_delete = get_resource_or_404(GroceryList, id_)
-
-    # we need to specifically delete the GroceryList's "Additional Ingredients" recipe
-    additional_ingredients = Recipe.query.filter(Recipe.name == "Additional Ingredients",
-                                                 Recipe.grocery_lists.contains(list_to_delete)).first()
     db.session.delete(list_to_delete)
-    db.session.delete(additional_ingredients)
     db.session.commit()
 
     return ("", 204)

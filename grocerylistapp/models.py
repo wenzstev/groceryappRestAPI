@@ -109,6 +109,7 @@ class Recipe(db.Model):
     grocery_lists = db.relationship("GroceryList",
                                     secondary=recipe_list_associations,
                                     back_populates="recipes")
+    ai_list = db.relationship("GroceryList", back_populates="additional_ingredients")
 
     def __hash__(self):
         return hash(self.id)
@@ -128,13 +129,18 @@ class GroceryList(db.Model):
     recipes = db.relationship("Recipe",
                               secondary=recipe_list_associations,
                               back_populates="grocery_lists")
+    additional_ingredients_id = db.Column(db.Integer, db.ForeignKey("recipe.id"))
     creator_id = db.Column(db.Integer, db.ForeignKey("user.id"))   # the creator of the grocerylist. can add others to edit
     creator = db.relationship("User", back_populates="created_lists")
     editors = db.relationship("User",                           # other users with permission to edit the grocery list
                             secondary=user_list_associations,
                             back_populates="editable_lists")
+    additional_ingredients = db.relationship("Recipe", back_populates="ai_list", cascade="all, delete-orphan", single_parent=True)
+
+
 
     # clears the grocerylist (for PUT requests) without removing the "Additional Ingredients" recipe
+    # CURRENTLY UNUSED
     def clear_grocerylist(self):
         print(self)
         additional_ingredients = Recipe.query \
@@ -144,6 +150,13 @@ class GroceryList(db.Model):
         additional_ingredients.recipe_lines.clear()
         self.recipes.clear()
         self.recipes.append(additional_ingredients)
+        db.session.commit()
+
+
+    def create_additional_ingredients_recipe(self):
+        additional_ingredients_recipe = Recipe(name="Additional Ingredients", creator_id=self.creator_id)
+        self.additional_ingredients = additional_ingredients_recipe
+        db.session.add(additional_ingredients_recipe)
         db.session.commit()
 
     def __repr__(self):

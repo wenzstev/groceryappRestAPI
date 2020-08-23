@@ -120,6 +120,8 @@ def verify_email():
     print("verifying email")
     token = request.args.get("token")
     print(token)
+    if not token:
+        raise InvalidUsage("No token received! Did you put it in the url?")
     user = User.verify_auth_token(token)
     if not user:
         raise InvalidUsage("Unable to get user from token.")
