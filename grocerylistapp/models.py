@@ -77,7 +77,7 @@ class RecipeLine(db.Model):
     __tablename__ = 'recipe_line'
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, nullable=False)  # the text of the line
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
     recipe = db.relationship("Recipe", back_populates="recipe_lines")
     ingredients = db.relationship("LineIngredientAssociations",
                                   back_populates="recipe_line")

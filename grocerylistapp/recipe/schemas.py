@@ -5,7 +5,7 @@ from flask import g
 from grocerylistapp import db, ma
 from grocerylistapp.models import Recipe
 from grocerylistapp.scraper import get_recipe_from_url
-from grocerylistapp.nlp import determine_ingredients_in_line
+from grocerylistapp.nlp import determine_ingredients_in_recipe
 
 
 # schema that returns/validates a recipe
@@ -33,7 +33,7 @@ class RecipeSchema(ma.SQLAlchemyAutoSchema):
             try:
                 print("creating recipe")
                 recipe_from_url = get_recipe_from_url(data["create_from_url"])
-                recipe_from_url_with_ingredients = determine_ingredients_in_line(recipe_from_url)
+                recipe_from_url_with_ingredients = determine_ingredients_in_recipe(recipe_from_url)
                 recipe_from_url_with_ingredients["creator_id"] = g.user.id
                 print("final structure:", recipe_from_url_with_ingredients)
                 return recipe_from_url_with_ingredients

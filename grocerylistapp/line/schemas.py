@@ -1,4 +1,4 @@
-from marshmallow import pre_load, post_load, pre_dump, post_dump, fields, EXCLUDE
+from marshmallow import pre_load, post_load, pre_dump, post_dump, fields, EXCLUDE, ValidationError
 from flask import g
 
 import json
@@ -7,6 +7,8 @@ from grocerylistapp import ma, db
 from grocerylistapp.models import RecipeLine, LineIngredientAssociations
 
 from grocerylistapp.ingredient.schemas import IngredientSchema
+
+from grocerylistapp.nlp import determine_ingredients_in_line
 
 
 class RecipelineIngredientAssociationSchema(ma.SQLAlchemyAutoSchema):
@@ -59,10 +61,19 @@ class RecipeLineSchema(ma.SQLAlchemyAutoSchema):
         new_recipeline.ingredients = data["ingredients"]  # add the ingredients separately so the validator works
         return new_recipeline
 
+    @pre_load
+    def convert_line_from_text(self, data, **kwargs):
+        if data["convert_from_text"] == True:
+            converted_data = determine_ingredients_in_line(data["text"])
+            converted_data["recipe_id"] = data["recipe_id"]
+            return converted_data
+        return data
+
     @post_dump
     def convert_string_to_list(self, data, **kwargs):
         print("postdump data:", data)
         data["text"] = json.loads(data["text"])
 
         return data
+
 
