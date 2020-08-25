@@ -67,6 +67,13 @@ class RecipeLineSchema(ma.SQLAlchemyAutoSchema):
             converted_data = determine_ingredients_in_line(data["text"])
             converted_data["recipe_id"] = data["recipe_id"]
             return converted_data
+        if data["additional_ingredient"] == True:
+            converted_data = determine_ingredients_in_line(data["text"])
+            converted_data["recipe_id"] = data["recipe_id"]
+            end_token = len(converted_data["text"])
+            overwrite_ingredients = {"ingredient": {"name": data["text"]}, "relevant_tokens":[0, end_token]}
+            converted_data["ingredients"] = overwrite_ingredients
+            return converted_data
         return data
 
     @post_dump
