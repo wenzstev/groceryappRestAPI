@@ -63,16 +63,17 @@ class RecipeLineSchema(ma.SQLAlchemyAutoSchema):
 
     @pre_load
     def convert_line_from_text(self, data, **kwargs):
-        if data["convert_from_text"] == True:
+        if data.get("convert_from_text"):
             converted_data = determine_ingredients_in_line(data["text"])
             converted_data["recipe_id"] = data["recipe_id"]
             return converted_data
-        if data["additional_ingredient"] == True:
+        if data.get("additional_ingredient"):
             converted_data = determine_ingredients_in_line(data["text"])
             converted_data["recipe_id"] = data["recipe_id"]
-            end_token = len(converted_data["text"])
-            overwrite_ingredients = {"ingredient": {"name": data["text"]}, "relevant_tokens":[0, end_token]}
-            converted_data["ingredients"] = overwrite_ingredients
+            end_token = len(json.loads(converted_data["text"]))     # have to load because it was packed in string form
+            overwrite_ingredients = {"ingredient": {"name": data["text"]}, "relevant_tokens": [0, end_token]}
+            converted_data["ingredients"] = [overwrite_ingredients]
+            print("converted data", converted_data)
             return converted_data
         return data
 

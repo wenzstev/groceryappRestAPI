@@ -58,7 +58,11 @@ def load_resource_from_schema(resource_type, new_resource_json):
 
 def post_new_resource(resource_type, new_resource_json):
     print("new resource", new_resource_json)
-    new_resource = load_resource_from_schema(resource_type, new_resource_json)
+    try:
+        new_resource = load_resource_from_schema(resource_type, new_resource_json)
+    except ValidationError as e:
+        print("here")
+        raise InvalidUsage("There was a problem with your formatting.", payload=(str(e)))
 
     try:
         db.session.add(new_resource)

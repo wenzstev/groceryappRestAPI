@@ -156,6 +156,7 @@ class GroceryList(db.Model):
     def create_additional_ingredients_recipe(self):
         additional_ingredients_recipe = Recipe(name="Additional Ingredients", creator_id=self.creator_id)
         self.additional_ingredients = additional_ingredients_recipe
+        self.recipes.append(additional_ingredients_recipe)
         db.session.add(additional_ingredients_recipe)
         db.session.commit()
 
