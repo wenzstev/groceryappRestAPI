@@ -6,41 +6,47 @@ from grocerylistapp.line.schemas import RecipeLineSchema
 
 
 def get_new_ingredients_on_line(new_ingredient_json, line_to_change):
-    print(line_to_change.text)
-    print(new_ingredient_json)
-
-    new_ingredients = []
-    cur_ingredient_index = None
     cur_ingredient = ""
+    cur_ingredient_id_ = None
     start = 0
+    ingredient_list = []
 
-    line_text_list = json.loads(line_to_change.text)
+    line_word_list = json.loads(line_to_change.text)
 
-    for i, (word, ingredient_index) in enumerate(zip(line_text_list, new_ingredient_json)):
-        print(i, word, ingredient_index)
-        if ingredient_index is not None:
-            # check if we are in a new ingredient
-            if cur_ingredient_index is None:
-                cur_ingredient_index = ingredient_index
-                print("cur ingredient index is now", cur_ingredient_index)
-                start = i
-            elif cur_ingredient_index != ingredient_index:
-                end = i + 1 # add one because spaCy end is exclusive
-                new_ingredients.append({"ingredient": cur_ingredient.strip(), "relevant_tokens": (start, end)})
-                print("cur_index is", cur_ingredient_index)
-                cur_ingredient_index = ingredient_index
-                cur_ingredient = ""
-                start = i
-            cur_ingredient += word + " "
-        elif cur_ingredient_index is not None:
-            print("appending", cur_ingredient)
-            new_ingredients.append({"ingredient": {"name":cur_ingredient.strip()}, "relevant_tokens":(start, i)})
-            cur_ingredient_index = None
+    for index, (ingredient_id_, word) in enumerate(zip(new_ingredient_json, line_word_list)):
+        print(index, ingredient_id_, word)
+        print(cur_ingredient_id_)
+        if ingredient_id_ is not None:
+            # we are in an ingredient
+            if cur_ingredient_id_ is None:
+                # starting new ingredient
+                start = index
+                cur_ingredient += word + " "
+                cur_ingredient_id_ = ingredient_id_
+            elif cur_ingredient_id_ != ingredient_id_:
+                # we are changing from one ingredient to another
+                ingredient_list.append(
+                    {"ingredient": {"name": cur_ingredient},
+                     "relevant_tokens": (start, index)})
+                cur_ingredient += word + " "
+                start = index
+                cur_ingredient_id_ = ingredient_id_
+            else:
+                cur_ingredient += word + " "
+        elif cur_ingredient_id_ is not None:
+            # we just ended an ingredient
+            ingredient_list.append(
+                {"ingredient": {"name": cur_ingredient},
+                 "relevant_tokens": (start, index)})
             cur_ingredient = ""
+            cur_ingredient_id_ = None
 
-    print("left with", cur_ingredient)
     if cur_ingredient:
-        print("appending last ingredient")
-        new_ingredients.append({"ingredient":{"name": cur_ingredient}, "relevant_tokens": (start, len(line_text_list))})
+        ingredient_list.append(
+            {"ingredient": {"name": cur_ingredient},
+                "relevant_tokens": (start, len(line_word_list))})
 
-    return json.dumps(new_ingredients)
+    print(json.dumps(ingredient_list))
+    return json.dumps(ingredient_list)
+
+

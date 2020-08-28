@@ -52,7 +52,7 @@ def put_recipe(id_):
     if recipe_to_change.creator_id == g.user.id:
         recipe_to_change.name = request.json.get("name", recipe_to_change.name)
         recipe_to_change.url = request.json.get("url", recipe_to_change.url)
-
+        db.session.commit()
         return jsonify(recipe_schema.dump(recipe_to_change))
     else:
         raise InvalidUsage("You don't have permission to modify this recipe.")

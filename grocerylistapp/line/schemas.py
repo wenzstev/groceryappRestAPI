@@ -73,13 +73,13 @@ class RecipeLineSchema(ma.SQLAlchemyAutoSchema):
             end_token = len(json.loads(converted_data["text"]))     # have to load because it was packed in string form
             overwrite_ingredients = {"ingredient": {"name": data["text"]}, "relevant_tokens": [0, end_token]}
             converted_data["ingredients"] = [overwrite_ingredients]
-            print("converted data", converted_data)
+            #print("converted data", converted_data)
             return converted_data
         return data
 
     @post_dump
     def convert_string_to_list(self, data, **kwargs):
-        print("postdump data:", data)
+        #print("postdump data:", data)
         data["text"] = json.loads(data["text"])
 
         return data
