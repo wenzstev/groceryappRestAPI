@@ -18,7 +18,7 @@ list_user_association_schema = EditorAssociationSchema()
 
 @associations.route("/list-recipe-associations", methods=["GET"])
 def get_list_recipe_associations():
-    return jsonify(list_recipes_associations_schema.dump(get_associaton_by_params(request.args)))
+    return jsonify(get_associaton_by_params(request.args))
 
 
 @associations.route("/list-recipe-associations/<int:id_>", methods=["GET"])

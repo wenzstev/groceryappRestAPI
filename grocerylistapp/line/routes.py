@@ -8,7 +8,7 @@ from grocerylistapp.utils import get_resource_or_404, put_resource, post_new_res
 from grocerylistapp.errors.exceptions import InvalidUsage
 
 from grocerylistapp.line.schemas import RecipeLineSchema, RecipelineIngredientAssociationSchema
-from grocerylistapp.line.utils import get_new_ingredients_on_line
+from grocerylistapp.line.utils import get_new_ingredients_on_line, get_line_by_params
 from grocerylistapp.ingredient.schemas import IngredientSchema
 
 line = Blueprint("line", __name__)
@@ -17,6 +17,11 @@ recipelines_schema = RecipeLineSchema(many=True)
 ingredients_schema = IngredientSchema(many=True)
 recipeline_association_schema = RecipelineIngredientAssociationSchema(many=True)
 
+
+@line.route("/lines", methods=['GET'])
+def get_lines_by_params():
+    lines = get_line_by_params(request.args)
+    return jsonify(recipelines_schema.dump(lines))
 
 @line.route("/lines/<int:id_>", methods=['GET'])
 def get_line(id_):

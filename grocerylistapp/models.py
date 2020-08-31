@@ -36,9 +36,9 @@ class LineIngredientAssociations(db.Model):
     ingredient_id = db.Column(db.ForeignKey('ingredient.id'))
     recipeline_id = db.Column(db.ForeignKey('recipe_line.id'))
     relevant_tokens = db.Column(db.String(), nullable=False)
+    color_index = db.Column(db.Integer, nullable=False, default=0) # the index of the color for the frontend
     ingredient = db.relationship("Ingredient", back_populates='recipe_lines')
     recipe_line = db.relationship("RecipeLine", back_populates='ingredients')
-    #TODO: color attribute to maintain persistent colors for frontend
 
     # TODO: Create a validator to confirm that the ingredient is on the recipe line
 

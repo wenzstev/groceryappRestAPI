@@ -8,19 +8,19 @@ def determine_ingredients_in_line(line):
         "text": [],
         "ingredients": []
     }
-    print(line)
     line_nlp = nlp(line)
+    color_index = 0
 
     current_recipe_line["text"] = json.dumps([token.text for token in line_nlp])
-    print(current_recipe_line["text"])
 
     for ent in line_nlp.ents:
-        print("entity:", ent)
         if (ent.label_ == "INGREDIENT"):
             current_recipe_line["ingredients"].append({
                 "ingredient": {"name": ent.text},
-                "relevant_tokens": json.dumps((ent.start, ent.end))
+                "relevant_tokens": json.dumps((ent.start, ent.end)),
+                "color_index": color_index
             })
+            color_index += 1
 
     return current_recipe_line
 

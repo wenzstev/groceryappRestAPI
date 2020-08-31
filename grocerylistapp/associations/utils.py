@@ -3,15 +3,29 @@ from flask import g, jsonify
 from grocerylistapp import db
 from grocerylistapp.errors.exceptions import InvalidUsage
 from grocerylistapp.models import recipe_list_associations, user_list_associations
+from grocerylistapp.associations.schemas import ListRecipeAssociationSchema
 
+list_recipes_associations_schema = ListRecipeAssociationSchema(many=True)
+list_recipes_association_schema = ListRecipeAssociationSchema()
 
 def get_associaton_by_params(param):
+    if param.get("recipe") and param.get("list"):
+        print(param.get("recipe"), param.get("list"))
+        association = db.session.query(recipe_list_associations)\
+            .filter(recipe_list_associations.c.recipe == param.get("recipe"))\
+            .filter(recipe_list_associations.c.grocery_list == param.get("list")).first()
+        print(association)
+        if not association:
+            raise InvalidUsage("No association exists between the specified list and recipe", 404)
+        return list_recipes_association_schema.dump(association)
     if param.get("recipe"):
-        return db.session.query(recipe_list_associations).filter(recipe_list_associations.c.recipe == param.get("recipe")).all()
-    if param.get("list"):
-        return db.session.query(recipe_list_associations).filter(recipe_list_associations.c.grocery_list == param.get("list")).all()
+        associations = db.session.query(recipe_list_associations).filter(recipe_list_associations.c.recipe == param.get("recipe")).all()
+    elif param.get("list"):
+        associations = db.session.query(recipe_list_associations).filter(recipe_list_associations.c.grocery_list == param.get("list")).all()
     else:
-        return db.session.query(recipe_list_associations).all()
+        associations = db.session.query(recipe_list_associations).all()
+
+    return list_recipes_associations_schema.dump(associations)
 
 
 def load_list_and_check_permissions(association_to_modify, association_schema):
