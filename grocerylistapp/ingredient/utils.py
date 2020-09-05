@@ -1,41 +1,27 @@
+from grocerylistapp import db
+
 from grocerylistapp.models import Ingredient, RecipeLine, Recipe, GroceryList, LineIngredientAssociations
 from grocerylistapp.errors.exceptions import InvalidUsage
 from grocerylistapp.utils import get_resource_or_404
 
-
+# TODO: refactor with better querying to remove the recipe ingredinet bug
 # method that checks if there are any arguments to filter, returns all ingredients if not
 def get_ingredient_by_params(args):
-    if args.get("recipe") and args.get("list"):
-        raise InvalidUsage("Error: can't filter by recipe and line at the same time")
+    recipes = args.get("recipe")
+    grocerylists = args.get("list")
+    ingredients = db.session.query(Ingredient)\
+                    .join(LineIngredientAssociations, "recipe_lines") \
+                    .join(RecipeLine) \
+                    .join(Recipe)
 
-    if args.get("recipe"):
-        set_to_return = set()
-        for recipe_id in args.get("recipe"):
-            set_to_return.update(
-                Ingredient.query
-                .join(LineIngredientAssociations, "recipe_lines")
-                .join(RecipeLine)
-                .join(Recipe)
-                .filter(Recipe.id == recipe_id)
-                .all())
-        return set_to_return
+    if recipes:
+        ingredients = ingredients.filter(Recipe.id.in_(recipes.split(",")))  # this is OR, what about AND?
 
-    if args.get("list"):
-        set_to_return = set()
-        for line_id in args.get("list"):
-            set_to_return.update(
-                Ingredient.query
-                .join(LineIngredientAssociations, "recipe_lines")
-                .join(RecipeLine)
-                .join(Recipe)
-                .join(GroceryList, Recipe.grocery_lists)
-                .filter(GroceryList.id == line_id)
-            )
-        return set_to_return
+    if grocerylists:
+        ingredients = ingredients.join(GroceryList, Recipe.grocery_lists)\
+            .filter(GroceryList.id.in_(grocerylists.split(",")))
 
-    # no queries, return all ingredients
-    return Ingredient.query.all()
-
+    return ingredients.all()
 
 # method that can take either a name or an id and return an ingredient
 def ingredient_by_name_or_id(identifier):
