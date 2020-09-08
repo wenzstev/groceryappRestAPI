@@ -70,7 +70,7 @@ def post_new_resource(resource_type, new_resource_json):
         return new_resource
 
     except IntegrityError as e:
-        raise InvalidUsage("You're trying to load something that is already in the database.", payload=str(e))
+        raise InvalidUsage("You're trying to load something that is already in the database.", payload="IntegrityError")
     except ValueError as e:
         raise InvalidUsage("You are trying to load a resource that does not conform to database standards.",
                            payload={"details": {"resource": resource_type.__tablename__, "comments": str(e)}})

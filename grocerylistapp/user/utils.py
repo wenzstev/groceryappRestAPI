@@ -29,7 +29,7 @@ def verify_password(username_or_token, password, needs_valid_email=True):
         if not user or not user.verify_password(password):
             return False
         if needs_valid_email and not user.email_validated:
-            raise InvalidUsage("Email not validated.", 401)
+            raise InvalidUsage("Email not validated.", 400)
     g.user = user
     return True
 

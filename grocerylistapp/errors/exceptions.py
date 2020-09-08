@@ -12,7 +12,7 @@ class InvalidUsage(Exception):
         self.payload = payload
 
     def to_dict(self):
-        rv = dict(self.payload or ())
+        rv = dict({"payload": self.payload} or ())
         rv['message'] = self.message
         return rv
 
