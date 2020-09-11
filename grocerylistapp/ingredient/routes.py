@@ -20,7 +20,7 @@ ingredients_schema = IngredientSchema(many=True)
 # debugging routes
 @ingredient.route("/")
 def home_api():
-    return {time:time.time()}
+    return {"time":time.time()}
 
 @ingredient.route("/api")
 def api_route():
