@@ -43,9 +43,12 @@ def get_user(id_):
 
 
 # delete a user
+@auth.login_required
 @user.route("/api/users/<int:id_>", methods=["DELETE"])
 def delete_user(id_):
     cur_user = get_resource_or_404(User, id_)
+    if g.user != cur_user:
+        raise InvalidUsage("You don't have permission to delete this user.", 401)
     db.session.delete(cur_user)
     db.session.commit()
 
