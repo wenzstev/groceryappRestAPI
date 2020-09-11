@@ -18,6 +18,8 @@ beautifulsoup4 = "*"
 requests = "*"
 spacy = "*"
 flask-cors = "*"
+gunicorn = "*"
+python-decouple = "*"
 
 [requires]
 python_version = "3.8"
