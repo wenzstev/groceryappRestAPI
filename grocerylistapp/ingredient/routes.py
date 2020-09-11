@@ -26,28 +26,28 @@ def home_api():
 def api_route():
     return {"route":"/api"}
 
-@ingredient.route("/ingredients", methods=['GET'])
+@ingredient.route("/api/ingredients", methods=['GET'])
 def get_ingredients():
     ingredients_to_return = get_ingredient_by_params(request.args)
     return jsonify(ingredients_schema.dump(ingredients_to_return))
 
 
-@ingredient.route("/ingredients", methods=['POST'])
+@ingredient.route("/api/ingredients", methods=['POST'])
 def add_ingredients():
     new_ingredient = post_new_resource(Ingredient, request.json)
     return jsonify(ingredient_schema.dump(new_ingredient)), 201
 
 
 
-@ingredient.route("/ingredients/<int:identifier>", methods=["GET"])
-@ingredient.route("/ingredients/<string:identifier>", methods=["GET"])
+@ingredient.route("/api/ingredients/<int:identifier>", methods=["GET"])
+@ingredient.route("/api/ingredients/<string:identifier>", methods=["GET"])
 def get_ingredient(identifier):
     cur_ingredient = get_resource_or_404(Ingredient, identifier)
     return jsonify(ingredient_schema.dump(cur_ingredient))
 
 
-@ingredient.route("/ingredients/<string:identifier>", methods=["DELETE"])
-@ingredient.route("/ingredients/<int:identifier>", methods=["DELETE"])
+@ingredient.route("/api/ingredients/<string:identifier>", methods=["DELETE"])
+@ingredient.route("/api/ingredients/<int:identifier>", methods=["DELETE"])
 def delete_ingredients(identifier):
     ingredient_to_delete = get_resource_or_404(Ingredient, identifier)
 
