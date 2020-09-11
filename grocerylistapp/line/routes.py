@@ -18,18 +18,18 @@ ingredients_schema = IngredientSchema(many=True)
 recipeline_association_schema = RecipelineIngredientAssociationSchema(many=True)
 
 
-@line.route("/lines", methods=['GET'])
+@line.route("/api/lines", methods=['GET'])
 def get_lines_by_params():
     lines = get_line_by_params(request.args)
     return jsonify(recipelines_schema.dump(lines))
 
-@line.route("/lines/<int:id_>", methods=['GET'])
+@line.route("/api/lines/<int:id_>", methods=['GET'])
 def get_line(id_):
     current_line = get_resource_or_404(RecipeLine, id_)
     return jsonify(recipeline_schema.dump(current_line))
 
 
-@line.route("/lines", methods=['POST'])
+@line.route("/api/lines", methods=['POST'])
 @auth.login_required
 def post_line():
     recipe_to_add_line = get_resource_or_404(Recipe, request.json.get("recipe_id"))
@@ -40,7 +40,7 @@ def post_line():
         raise InvalidUsage("You don't have permission to modify that recipe.")
 
 # FIXME: this is currently broken after the changes to RecipeLines in the model
-@line.route("/lines/<int:id_>", methods=['PUT'])
+@line.route("/api/lines/<int:id_>", methods=['PUT'])
 @auth.login_required
 def put_line(id_):
     line_to_change = get_resource_or_404(RecipeLine, id_)
@@ -53,7 +53,7 @@ def put_line(id_):
         raise InvalidUsage("You don't have permission to modify that line.", 401)
 
 
-@line.route('/lines/<int:id_>/ingredients', methods=['PUT'])
+@line.route('/api/lines/<int:id_>/ingredients', methods=['PUT'])
 @auth.login_required
 def change_ingredients_in_line(id_):
     line_to_change = get_resource_or_404(RecipeLine, id_)
@@ -71,7 +71,7 @@ def change_ingredients_in_line(id_):
         raise InvalidUsage("You don't have permission to modify that line.", 401)
 
 
-@line.route("/lines/<int:id_>", methods=["DELETE"])
+@line.route("/api/lines/<int:id_>", methods=["DELETE"])
 @auth.login_required
 def delete_line(id_):
     line_to_delete = get_resource_or_404(RecipeLine, id_)

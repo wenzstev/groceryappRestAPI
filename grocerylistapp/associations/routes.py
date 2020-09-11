@@ -16,18 +16,18 @@ list_user_associations_schema = EditorAssociationSchema(many=True)
 list_user_association_schema = EditorAssociationSchema()
 
 
-@associations.route("/list-recipe-associations", methods=["GET"])
+@associations.route("/api/list-recipe-associations", methods=["GET"])
 def get_list_recipe_associations():
     return jsonify(get_associaton_by_params(request.args))
 
 
-@associations.route("/list-recipe-associations/<int:id_>", methods=["GET"])
+@associations.route("/api/list-recipe-associations/<int:id_>", methods=["GET"])
 def get_specific_association(id_):
     current_association = get_association_or_404(id_, recipe_list_associations)
     return jsonify(list_recipes_association_schema.dump(current_association))
 
 
-@associations.route("/list-recipe-associations", methods=["POST"])
+@associations.route("/api/list-recipe-associations", methods=["POST"])
 @auth.login_required
 def put_list_recipe_associations():
     list_to_modify, recipe_to_add = load_list_and_check_permissions(request.json, list_recipes_association_schema)
@@ -41,7 +41,7 @@ def put_list_recipe_associations():
     ), 201
 
 
-@associations.route("/list-recipe-associations/<int:id_>", methods=["DELETE"])
+@associations.route("/api/list-recipe-associations/<int:id_>", methods=["DELETE"])
 @auth.login_required
 def delete_list_recipe_assocation(id_):
     association_to_remove = get_association_or_404(id_, recipe_list_associations)
@@ -51,18 +51,18 @@ def delete_list_recipe_assocation(id_):
     return "", 204
 
 # EDITOR ASSOCIATION ENDPOINTS
-@associations.route("/list-user-associations", methods=["GET"])
+@associations.route("/api/list-user-associations", methods=["GET"])
 def get_list_user_associations():
     return jsonify(list_user_associations_schema.dump(db.session.query(user_list_associations).all()))
 
 
-@associations.route("/list-user-associations/<int:id_>", methods=["GET"])
+@associations.route("/api/list-user-associations/<int:id_>", methods=["GET"])
 def get_specific_list_user_association(id_):
     specific_association = get_association_or_404(id_, user_list_associations)
     return jsonify(list_user_association_schema.dump(specific_association))
 
 
-@associations.route("/list-user-associations", methods=["POST"])
+@associations.route("/api/list-user-associations", methods=["POST"])
 @auth.login_required
 def post_list_user_association():
     list_to_modify, new_editor = load_list_and_check_permissions(request.json, list_user_association_schema)
@@ -76,7 +76,7 @@ def post_list_user_association():
     )), 201
 
 
-@associations.route("/list-user-associations/<int:id_>", methods=["DELETE"])
+@associations.route("/api/list-user-associations/<int:id_>", methods=["DELETE"])
 @auth.login_required
 def delete_list_user_association(id_):
     association_to_remove = get_association_or_404(id_, user_list_associations)

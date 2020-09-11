@@ -20,7 +20,7 @@ create_user_schema = PostUserSchema()
 
 
 # return all users, or a filtered list
-@user.route("/users", methods=["GET"])
+@user.route("/api/users", methods=["GET"])
 @auth.login_required
 def get_users():
     all_users = User.query.all()
@@ -28,7 +28,7 @@ def get_users():
 
 
 # post a new user
-@user.route("/users", methods=["POST"])
+@user.route("/api/users", methods=["POST"])
 def post_user():
     print(request.json)
     new_user = post_new_resource(User, request.json)
@@ -36,14 +36,14 @@ def post_user():
 
 
 # get a specific user
-@user.route("/users/<int:id_>", methods=["GET"])
+@user.route("/api/users/<int:id_>", methods=["GET"])
 def get_user(id_):
     cur_user = get_resource_or_404(User, id_)
     return jsonify(user_schema.dump(cur_user))
 
 
 # delete a user
-@user.route("/users/<int:id_>", methods=["DELETE"])
+@user.route("/api/users/<int:id_>", methods=["DELETE"])
 def delete_user(id_):
     cur_user = get_resource_or_404(User, id_)
     db.session.delete(cur_user)
@@ -53,7 +53,7 @@ def delete_user(id_):
 
 
 # change user information
-@user.route("/users/<int:id_>", methods=["PUT"])
+@user.route("/api/users/<int:id_>", methods=["PUT"])
 @auth.login_required
 def change_user_info(id_):
     updated_user = get_resource_or_404(User, id_)
@@ -73,7 +73,7 @@ def change_user_info(id_):
 
 
 # get a token for a user
-@user.route("/users/token")
+@user.route("/api/users/token")
 def get_auth_token():
     refresh_token = request.cookies.get('refresh_token')
     print(refresh_token)
@@ -88,7 +88,7 @@ def get_auth_token():
 
 
 # get a refresh token for a user
-@user.route("/users/refresh-token")
+@user.route("/api/users/refresh-token")
 @auth.login_required
 def get_refresh_token():
     refresh_token = g.user.generate_auth_token(expiration=1209600)  # 14 days
@@ -99,7 +99,7 @@ def get_refresh_token():
 
 
 # send a verification email
-@user.route("/users/verification", methods=["GET"])
+@user.route("/api/users/verification", methods=["GET"])
 def send_verify_email():
     # not using decorator because email is not yet validated
     username = request.authorization["username"]
@@ -115,7 +115,7 @@ def send_verify_email():
 
 
 # receive verification confirmation
-@user.route("/users/verification", methods=["PUT"])
+@user.route("/api/users/verification", methods=["PUT"])
 def verify_email():
     print("verifying email")
     token = request.args.get("token")
@@ -131,7 +131,7 @@ def verify_email():
 
 
 # log out user by deleting httpOnly refresh cookie
-@user.route('/users/logout')
+@user.route('/api/users/logout')
 def logout_user():
     response = make_response('', 204)
     response.set_cookie('refresh_token', '', expires=0)

@@ -23,7 +23,7 @@ recipelines_schema = RecipeLineSchema(many=True)
 user_schema = UserSchema()
 
 
-@recipe.route("/recipes", methods=["GET"])
+@recipe.route("/api/recipes", methods=["GET"])
 def get_recipes():
     recipes = get_recipe_by_params(request.args)
     print("loaded recipes")
@@ -32,20 +32,20 @@ def get_recipes():
     return jsonify(recipes_schema.dump(recipes))
 
 
-@recipe.route("/recipes", methods=["POST"])
+@recipe.route("/api/recipes", methods=["POST"])
 @auth.login_required
 def post_recipe():
     new_recipe = post_new_resource(Recipe, request.json)
     return jsonify(recipe_schema.dump(new_recipe)), 201
 
 
-@recipe.route("/recipes/<int:id_>", methods=["GET"])
+@recipe.route("/api/recipes/<int:id_>", methods=["GET"])
 def get_recipe_info(id_):
     current_recipe = get_resource_or_404(Recipe, id_)
     return jsonify(recipe_schema.dump(current_recipe))
 
 
-@recipe.route("/recipes/<int:id_>", methods=["PUT"])
+@recipe.route("/api/recipes/<int:id_>", methods=["PUT"])
 @auth.login_required
 def put_recipe(id_):
     recipe_to_change = get_resource_or_404(Recipe, id_)
@@ -59,7 +59,7 @@ def put_recipe(id_):
 
 
 
-@recipe.route("/recipes/<int:id_>", methods=["DELETE"])
+@recipe.route("/api/recipes/<int:id_>", methods=["DELETE"])
 @auth.login_required
 def delete_recipe(id_):
     recipe_to_delete = get_resource_or_404(Recipe, id_)

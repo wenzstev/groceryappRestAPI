@@ -21,14 +21,14 @@ users_schema = UserSchema(many=True, exclude=("hashed_password",))
 
 
 # return list of GroceryLists, with optional filters
-@grocerylist.route("/lists", methods=["GET"])
+@grocerylist.route("/api/lists", methods=["GET"])
 def get_lists():
     lists = get_list_by_params(request.args)
     return jsonify(grocerylists_schema.dump(lists))
 
 
 # post a new GroceryList
-@grocerylist.route("/lists", methods=["POST"])
+@grocerylist.route("/api/lists", methods=["POST"])
 @auth.login_required
 def post_list():
     new_list_json = request.json
@@ -39,14 +39,14 @@ def post_list():
 
 
 # get a specific GroceryList
-@grocerylist.route("/lists/<int:id_>", methods=["GET"])
+@grocerylist.route("/api/lists/<int:id_>", methods=["GET"])
 def get_list(id_):
     current_list = get_resource_or_404(GroceryList, id_)
     return jsonify(grocerylist_schema.dump(current_list))
 
 
 # set GroceryList recipe and ingredients
-@grocerylist.route("/lists/<int:id_>", methods=["PUT"])
+@grocerylist.route("/api/lists/<int:id_>", methods=["PUT"])
 @auth.login_required
 def modify_list(id_):
     list_to_modify = get_resource_or_404(GroceryList, id_)
@@ -59,7 +59,7 @@ def modify_list(id_):
 
 
 # special route for accessing the "Additional Ingredients" recipe for a specific list
-@grocerylist.route("/lists/<int:id_>/additionalingredients", methods=['GET'])
+@grocerylist.route("/api/lists/<int:id_>/additionalingredients", methods=['GET'])
 def get_additional_ingredients(id_):
     list_to_get = get_resource_or_404(GroceryList, id_)
     recipe_schema = RecipeSchema()
@@ -68,7 +68,7 @@ def get_additional_ingredients(id_):
 
 
 # set editors to a GroceryList
-@grocerylist.route("/lists/<int:id_>/editors", methods=["PUT"])
+@grocerylist.route("/api/lists/<int:id_>/editors", methods=["PUT"])
 @auth.login_required
 def add_editors(id_):
     current_list = get_resource_or_404(GroceryList, id_)
@@ -82,7 +82,7 @@ def add_editors(id_):
 
 
 # delete a GroceryList
-@grocerylist.route("/lists/<int:id_>", methods=["DELETE"])
+@grocerylist.route("/api/lists/<int:id_>", methods=["DELETE"])
 def delete_list(id_):
     list_to_delete = get_resource_or_404(GroceryList, id_)
     db.session.delete(list_to_delete)
