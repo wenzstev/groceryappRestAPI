@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-
+import time
 from sqlalchemy.exc import IntegrityError
 
 from grocerylistapp import db
@@ -16,6 +16,15 @@ ingredient = Blueprint('ingredient', __name__)
 ingredient_schema = IngredientSchema()
 ingredients_schema = IngredientSchema(many=True)
 
+
+# debugging routes
+@ingredient.route("/")
+def home_api():
+    return {time:time.time()}
+
+@ingredient.route("/api")
+def api_route():
+    return {"route":"/api"}
 
 @ingredient.route("/ingredients", methods=['GET'])
 def get_ingredients():
