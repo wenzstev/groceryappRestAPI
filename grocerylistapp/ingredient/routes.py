@@ -7,7 +7,7 @@ from grocerylistapp.models import Ingredient, Recipe, RecipeLine
 from grocerylistapp.utils import get_resource_or_404, post_new_resource
 
 from grocerylistapp.ingredient.schemas import IngredientSchema
-from grocerylistapp.ingredient.utils import ingredient_by_name_or_id, get_ingredient_by_params
+from grocerylistapp.ingredient.utils import ingredient_by_name_or_id, get_ingredient_by_params, souschef_base_route
 
 from grocerylistapp.errors.exceptions import InvalidUsage, NotFoundException
 
@@ -17,14 +17,10 @@ ingredient_schema = IngredientSchema()
 ingredients_schema = IngredientSchema(many=True)
 
 
-# debugging routes
-@ingredient.route("/")
-def home_api():
-    return {"time":time.time()}
 
 @ingredient.route("/api")
 def api_route():
-    return {"route":"/api"}
+    return souschef_base_route()
 
 @ingredient.route("/api/ingredients", methods=['GET'])
 def get_ingredients():

@@ -29,3 +29,13 @@ def ingredient_by_name_or_id(identifier):
         return Ingredient.query.filter_by(name=identifier.replace("-", " ")).first()
     if type(identifier) == int:
         return Ingredient.query.get(identifier)
+
+
+def souschef_base_route():
+    return {
+        "message": '''Welcome to the SousChef API! This is the backbone for the SousChef application. Access points are available for users, ingredients, recipes, and grocery lists, as well as various associations between them. Queries can be made to cross-reference most  resources against each other; for example, to search for recipes with oysters, use the endpoint '/recipes?ingredients=oysters'. 
+        Please check back on this page often as I am constantly working to make this api more accessible! 
+        Thanks for stopping by.         
+        -Steve
+        '''
+    }

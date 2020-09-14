@@ -8,7 +8,7 @@ from grocerylistapp.errors.exceptions import InvalidUsage
 
 # email a user with the validation route, provided by the client
 def send_validate_email(user, route):
-    token = user.generate_auth_token(expiration=2000)
+    token = user.generate_auth_token(expiration=None)
     print("token:", token)
     msg = Message('Verify Your Email', sender='groceryapp@gmail.com', recipients=[user.email])
     msg.body = f'''To verify your email, please visit this link: {route}?token={token}.'''

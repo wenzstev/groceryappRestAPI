@@ -123,6 +123,7 @@ def verify_email():
     print("verifying email")
     token = request.args.get("token")
     print(token)
+    print("args", request.args)
     if not token:
         raise InvalidUsage("No token received! Did you put it in the url?")
     user = User.verify_auth_token(token)
