@@ -34,14 +34,19 @@ class RecipeSchema(ma.SQLAlchemyAutoSchema):
                 print("creating recipe")
                 recipe_from_url = get_recipe_from_url(data["create_from_url"])
                 recipe_from_url_with_ingredients = determine_ingredients_in_recipe(recipe_from_url)
-                recipe_from_url_with_ingredients["creator_id"] = g.user.id
-                print("final structure:", recipe_from_url_with_ingredients)
+                try:
+                    recipe_from_url_with_ingredients["creator_id"] = g.user.id
+                except AttributeError:
+                    pass
                 return recipe_from_url_with_ingredients
             except KeyError as e:
                 raise ValidationError(f"Missing data: {repr(e)}")
 
         if not data.get('creator'):
-            data['creator_id'] = g.user.id
+            try:
+                data['creator_id'] = g.user.id
+            except AttributeError:
+                pass
         print(data)
         return data
 

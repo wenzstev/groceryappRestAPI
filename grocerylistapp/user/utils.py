@@ -20,6 +20,7 @@ def send_validate_email(user, route):
 # verifying password and email
 @auth.verify_password
 def verify_password(username_or_token, password, needs_valid_email=True):
+    print("verifying")
     print(username_or_token, password)
     # first try to authenticate by token
     user = User.verify_auth_token(username_or_token)

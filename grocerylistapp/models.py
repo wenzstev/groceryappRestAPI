@@ -102,7 +102,7 @@ class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     url = db.Column(db.String(200))     # url of where the recipe was gotten (if applicable)
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # the creator of the recipe (used for editing permissions)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # the creator of the recipe (used for editing permissions)
     creator = db.relationship("User", back_populates="recipes")
     recipe_lines = db.relationship("RecipeLine",
                                    back_populates='recipe',

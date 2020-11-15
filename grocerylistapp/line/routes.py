@@ -54,10 +54,12 @@ def put_line(id_):
 
 
 @line.route('/api/lines/<int:id_>/ingredients', methods=['PUT'])
-@auth.login_required
 def change_ingredients_in_line(id_):
     line_to_change = get_resource_or_404(RecipeLine, id_)
-    if g.user.id == line_to_change.recipe.creator_id:
+
+    logged_in = hasattr(g, 'user')
+
+    def change_line():
         new_ingredients_json = request.json.get("new_ingredients")
         print(new_ingredients_json)
         new_ingredients = get_new_ingredients_on_line(new_ingredients_json, line_to_change)
@@ -67,16 +69,22 @@ def change_ingredients_in_line(id_):
         db.session.commit()
         return jsonify(recipeline_schema.dump(line_to_change))
 
+    if not line_to_change.recipe.creator_id: # anonymously created
+        return change_line()
+
+    if logged_in and g.user.id == line_to_change.recipe.creator_id:
+        return change_line()
     else:
         raise InvalidUsage("You don't have permission to modify that line.", 401)
 
 
 @line.route("/api/lines/<int:id_>", methods=["DELETE"])
-@auth.login_required
 def delete_line(id_):
     line_to_delete = get_resource_or_404(RecipeLine, id_)
 
-    db.session.delete(line_to_delete)
-    db.session.commit()
-
-    return ('', 204)
+    if not line_to_delete.recipe.creator_id or hasattr(g, 'user') and g.user.id == line_to_delete.recipe.creator_id:
+        db.session.delete(line_to_delete)
+        db.session.commit()
+        return ('', 204)
+    else:
+        return ('', 403)

@@ -39,6 +39,12 @@ def post_recipe():
     return jsonify(recipe_schema.dump(new_recipe)), 201
 
 
+@recipe.route("/api/recipes/nologin", methods=["POST"])
+def post_recipe_nologin():
+    new_recipe = post_new_resource(Recipe, request.json)
+    return jsonify(recipe_schema.dump(new_recipe)), 201
+
+
 @recipe.route("/api/recipes/<int:id_>", methods=["GET"])
 def get_recipe_info(id_):
     current_recipe = get_resource_or_404(Recipe, id_)
