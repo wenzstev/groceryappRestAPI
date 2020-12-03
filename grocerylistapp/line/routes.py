@@ -54,6 +54,7 @@ def put_line(id_):
 
 
 @line.route('/api/lines/<int:id_>/ingredients', methods=['PUT'])
+@auth.login_required
 def change_ingredients_in_line(id_):
     line_to_change = get_resource_or_404(RecipeLine, id_)
 
@@ -71,6 +72,8 @@ def change_ingredients_in_line(id_):
 
     if not line_to_change.recipe.creator_id: # anonymously created
         return change_line()
+
+    print(logged_in, g.user)
 
     if logged_in and g.user.id == line_to_change.recipe.creator_id:
         return change_line()
