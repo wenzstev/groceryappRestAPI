@@ -3,6 +3,8 @@ import json
 import requests
 
 
+from grocerylistapp.errors.exceptions import InvalidUsage
+
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
@@ -152,6 +154,7 @@ def get_recipe_from_url(url):
 
     print('url is from ', o.netloc)
 
+
     parsing_information = ingredient_parsers.get(o.netloc, "")
 
     if parsing_information:
@@ -176,6 +179,12 @@ def get_recipe_from_url(url):
         # the user's recipe isn't recognized
         recipe_title = soup.title.get_text()
         ingredient_lines = []
+
+        print("not recognized")
+
+        raise InvalidUsage("Website isn't in list", status_code=501, payload=o.netloc)
+
+    
 
     print(recipe_title, ingredient_lines, url)
 
