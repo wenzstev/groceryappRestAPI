@@ -22,7 +22,7 @@ class GroceryListSchema(ma.SQLAlchemyAutoSchema):
         try:
             for index, recipe in enumerate(data["recipes"]):
                 try:
-                    full_recipe_schema = recipe_schema.dump(Recipe.query.get(recipe["id"]))
+                    full_recipe_schema = recipe_schema.dump(Recipe.query.get(recipe["id_"]))
                     data["recipes"][index] = full_recipe_schema
                 except KeyError:
                     raise ValidationError(f"Unable to find recipe: ID not provided. Value: {recipe}")

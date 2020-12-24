@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 
-from grocerylistapp import db, auth
+from grocerylistapp import db
 from grocerylistapp.models import GroceryList, Recipe, recipe_list_associations
 from grocerylistapp.utils import get_resource_or_404, post_new_resource, put_resource
 
@@ -29,12 +29,12 @@ def get_lists():
 
 # post a new GroceryList
 @grocerylist.route("/api/lists", methods=["POST"])
-@auth.login_required
 def post_list():
     new_list_json = request.json
-    new_list_json["creator_id"] = g.user.id
+    new_list_json["creator_id"] = None 
     new_grocerylist = post_new_resource(GroceryList, new_list_json)
     new_grocerylist.create_additional_ingredients_recipe()
+    print("list", grocerylist_schema.dump(new_grocerylist))
     return jsonify(grocerylist_schema.dump(new_grocerylist)), 201
 
 
@@ -47,7 +47,6 @@ def get_list(id_):
 
 # set GroceryList recipe and ingredients
 @grocerylist.route("/api/lists/<int:id_>", methods=["PUT"])
-@auth.login_required
 def modify_list(id_):
     list_to_modify = get_resource_or_404(GroceryList, id_)
     if list_to_modify.creator_id == g.user.id or g.user.id in list_to_modify.editors:
@@ -69,7 +68,6 @@ def get_additional_ingredients(id_):
 
 # set editors to a GroceryList
 @grocerylist.route("/api/lists/<int:id_>/editors", methods=["PUT"])
-@auth.login_required
 def add_editors(id_):
     current_list = get_resource_or_404(GroceryList, id_)
     if current_list.creator is not g.user:

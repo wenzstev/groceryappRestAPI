@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, g
 
 from marshmallow import ValidationError
 
-from grocerylistapp import db, auth
+from grocerylistapp import db
 from grocerylistapp.models import Recipe
 from grocerylistapp.utils import get_resource_or_404, post_new_resource, put_resource
 from grocerylistapp.errors.exceptions import InvalidUsage
@@ -33,7 +33,6 @@ def get_recipes():
 
 
 @recipe.route("/api/recipes", methods=["POST"])
-@auth.login_required
 def post_recipe():
     new_recipe = post_new_resource(Recipe, request.json)
     return jsonify(recipe_schema.dump(new_recipe)), 201
@@ -52,7 +51,6 @@ def get_recipe_info(id_):
 
 
 @recipe.route("/api/recipes/<int:id_>", methods=["PUT"])
-@auth.login_required
 def put_recipe(id_):
     recipe_to_change = get_resource_or_404(Recipe, id_)
     if recipe_to_change.creator_id == g.user.id:
@@ -66,7 +64,6 @@ def put_recipe(id_):
 
 
 @recipe.route("/api/recipes/<int:id_>", methods=["DELETE"])
-@auth.login_required
 def delete_recipe(id_):
     recipe_to_delete = get_resource_or_404(Recipe, id_)
 

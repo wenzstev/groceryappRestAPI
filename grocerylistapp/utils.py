@@ -93,7 +93,7 @@ def put_resource(resource_type, old_version_of_resource, json_with_new_resource,
 
     print(old_version_of_resource)
 
-    new_version_of_resource.id = id_
+    new_version_of_resource.id_ = id_
     db.session.add(new_version_of_resource)
 
 

@@ -14,8 +14,8 @@ from grocerylistapp.user.schemas import UserSchema, PostUserSchema
 
 
 user = Blueprint("user", __name__)
-user_schema = UserSchema(only=("email", "id", "access_level"))
-users_schema = UserSchema(many=True, only=("email", "id", "access_level"))
+user_schema = UserSchema(only=("email", "id_", "access_level"))
+users_schema = UserSchema(many=True, only=("email", "id_", "access_level"))
 create_user_schema = PostUserSchema()
 
 

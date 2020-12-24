@@ -9,23 +9,23 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSign
 # association table between RecipeLine and Ingredient models (many-to-many relationship)
 # CURRENTLY UNUSED
 line_ingredient_associations = db.Table('line_ingredient_associations_UNUSED',
-                                        db.Column('ingredient', db.Integer, db.ForeignKey('ingredient.id')),
-                                        db.Column('recipe_line', db.Integer, db.ForeignKey('recipe_line.id')),
+                                        db.Column('ingredient', db.Integer, db.ForeignKey('ingredient.id_')),
+                                        db.Column('recipe_line', db.Integer, db.ForeignKey('recipe_line.id_')),
                                         db.Column('relevant_tokens', db.String)
                                         )
 
 # association table between Recipe and GroceryList models (many-to-many relationship)
 recipe_list_associations = db.Table('recipe_list_associations',
-                                    db.Column('id', db.Integer, primary_key=True),
-                                    db.Column('recipe', db.Integer, db.ForeignKey('recipe.id')),
-                                    db.Column('grocery_list', db.Integer, db.ForeignKey('grocery_list.id'))
+                                    db.Column('id_', db.Integer, primary_key=True),
+                                    db.Column('recipe', db.Integer, db.ForeignKey('recipe.id_')),
+                                    db.Column('grocery_list', db.Integer, db.ForeignKey('grocery_list.id_'))
                                     )
 
 # association table between GroceryList and User models (many-to-many relationship)
 user_list_associations = db.Table('user_list_associations',
-                                  db.Column('id', db.Integer, primary_key=True),
-                                  db.Column('grocery_list', db.Integer, db.ForeignKey('grocery_list.id')),
-                                  db.Column('user', db.Integer, db.ForeignKey('user.id'))
+                                  db.Column('id_', db.Integer, primary_key=True),
+                                  db.Column('grocery_list', db.Integer, db.ForeignKey('grocery_list.id_')),
+                                  db.Column('user', db.Integer, db.ForeignKey('user.id_'))
                                   )
 
 
@@ -33,8 +33,8 @@ user_list_associations = db.Table('user_list_associations',
 class LineIngredientAssociations(db.Model):
     __tablename__='line_ingredient_associations'
     id_ = db.Column(db.Integer, primary_key=True)  # separate because ingredient could appear more than once in a line
-    ingredient_id = db.Column(db.ForeignKey('ingredient.id'))
-    recipeline_id = db.Column(db.ForeignKey('recipe_line.id'))
+    ingredient_id = db.Column(db.ForeignKey('ingredient.id_'))
+    recipeline_id = db.Column(db.ForeignKey('recipe_line.id_'))
     relevant_tokens = db.Column(db.String(), nullable=False)
     color_index = db.Column(db.Integer, nullable=False, default=0) # the index of the color for the frontend
     ingredient = db.relationship("Ingredient", back_populates='recipe_lines')
@@ -48,7 +48,7 @@ class LineIngredientAssociations(db.Model):
 # Represents an ingredient.
 class Ingredient(db.Model):
     __tablename__ = 'ingredient'
-    id = db.Column(db.Integer, primary_key=True)
+    id_ = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)    # the actual name of the ingredient
     recipe_lines = db.relationship("LineIngredientAssociations",    # lines where this ingredient appears.
                                    back_populates='ingredient')
@@ -63,11 +63,11 @@ class Ingredient(db.Model):
 
     # equal function for comparing different instances of the same Ingredient
     def __eq__(self, other):
-        return self.id == other.id and self.name == other.name
+        return self.id_ == other.id_ and self.name == other.name
 
     # hash function to enable sets to eliminate duplicates
     def __hash__(self):
-        return hash((self.id, self.name))
+        return hash((self.id_, self.name))
 
     def __repr__(self):
         return f"<Ingredient '{self.name}'>"
@@ -76,19 +76,19 @@ class Ingredient(db.Model):
 # Represents a line in a recipe. Can hold an arbitrary number of ingredients
 class RecipeLine(db.Model):
     __tablename__ = 'recipe_line'
-    id = db.Column(db.Integer, primary_key=True)
+    id_ = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, nullable=False)  # the text of the line
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'))
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id_'))
     recipe = db.relationship("Recipe", back_populates="recipe_lines")
     ingredients = db.relationship("LineIngredientAssociations",
                                   back_populates="recipe_line")
 
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.id_)
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.id_ == other.id_
 
     def __repr__(self):
         print(self.recipe)
@@ -99,10 +99,10 @@ class RecipeLine(db.Model):
 # Represents a recipe. Can relate to an arbitrary number of RecipeLines, many-to-one
 class Recipe(db.Model):
     __tablename__ = 'recipe'
-    id = db.Column(db.Integer, primary_key=True)
+    id_ = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     url = db.Column(db.String(200))     # url of where the recipe was gotten (if applicable)
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # the creator of the recipe (used for editing permissions)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id_'))  # the creator of the recipe (used for editing permissions)
     creator = db.relationship("User", back_populates="recipes")
     recipe_lines = db.relationship("RecipeLine",
                                    back_populates='recipe',
@@ -113,25 +113,25 @@ class Recipe(db.Model):
     ai_list = db.relationship("GroceryList", back_populates="additional_ingredients")
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.id_)
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.id_ == other.id_
 
     def __repr__(self):
-        return f"<Recipe '{self.name}' id: {self.id}>"
+        return f"<Recipe '{self.name}' id_: {self.id_}>"
 
 
 # Represents a grocery list. Can relate to an arbitrary number of Recipes and Users (to allow collaboration)
 class GroceryList(db.Model):
     __tablename__ = 'grocery_list'
-    id = db.Column(db.Integer, primary_key=True)
+    id_ = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     recipes = db.relationship("Recipe",
                               secondary=recipe_list_associations,
                               back_populates="grocery_lists")
-    additional_ingredients_id = db.Column(db.Integer, db.ForeignKey("recipe.id"))
-    creator_id = db.Column(db.Integer, db.ForeignKey("user.id"))   # the creator of the grocerylist. can add others to edit
+    additional_ingredients_id = db.Column(db.Integer, db.ForeignKey("recipe.id_"))
+    creator_id = db.Column(db.Integer, db.ForeignKey("user.id_"))   # the creator of the grocerylist. can add others to edit
     creator = db.relationship("User", back_populates="created_lists")
     editors = db.relationship("User",                           # other users with permission to edit the grocery list
                             secondary=user_list_associations,
@@ -159,6 +159,7 @@ class GroceryList(db.Model):
         self.additional_ingredients = additional_ingredients_recipe
         self.recipes.append(additional_ingredients_recipe)
         db.session.add(additional_ingredients_recipe)
+        print(additional_ingredients_recipe)
         db.session.commit()
 
     def __repr__(self):
@@ -168,7 +169,7 @@ class GroceryList(db.Model):
 # Represents a user. Can relate to an arbitrary number of GroceryLists
 class User(db.Model):
     __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
+    id_ = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
     email_validated = db.Column(db.Boolean, nullable=False, default=False)
     hashed_password = db.Column(db.String(16), nullable=False)

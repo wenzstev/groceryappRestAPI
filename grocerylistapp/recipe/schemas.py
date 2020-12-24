@@ -15,14 +15,14 @@ class RecipeSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
 
     # nested Schema for recipe lines
-    recipe_lines = fields.Nested("RecipeLineSchema", many=True, exclude=("recipe_id",))
+    recipe_lines = fields.Nested("RecipeLineSchema", many=True, exclude=("recipe_id_",))
 
     # nested schema for the creator
     creator = fields.Nested("UserSchema", exclude=("hashed_password",))
 
     # provide links to the resource
     _links = ma.Hyperlinks(
-        {"individual": ma.URLFor("recipe.get_recipe_info", id_="<id>"),
+        {"individual": ma.URLFor("recipe.get_recipe_info", id_="<id_>"),
          "collection": ma.URLFor("recipe.get_recipes")}
     )
 
@@ -42,11 +42,6 @@ class RecipeSchema(ma.SQLAlchemyAutoSchema):
             except KeyError as e:
                 raise ValidationError(f"Missing data: {repr(e)}")
 
-        if not data.get('creator'):
-            try:
-                data['creator_id'] = g.user.id
-            except AttributeError:
-                pass
         print(data)
         return data
 

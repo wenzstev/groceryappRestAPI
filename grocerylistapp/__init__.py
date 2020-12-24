@@ -37,8 +37,8 @@ def create_app(config_class=Config):
     from grocerylistapp.grocerylist.routes import grocerylist
     app.register_blueprint(grocerylist)
 
-    from grocerylistapp.user.routes import user
-    app.register_blueprint(user)
+#    from grocerylistapp.user.routes import user
+#    app.register_blueprint(user)
 
     from grocerylistapp.associations.routes import associations
     app.register_blueprint(associations)
