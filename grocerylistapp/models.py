@@ -189,7 +189,7 @@ class User(db.Model):
         return pwd_context.verify(password, self.hashed_password)
 
     # generate a secure token for authentication
-    def generate_auth_token(self, expiration=600):
+    def generate_auth_token(self, expiration=24000):
         s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id}).decode("utf-8")
 

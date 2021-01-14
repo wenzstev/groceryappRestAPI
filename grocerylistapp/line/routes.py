@@ -82,8 +82,11 @@ def change_ingredients_in_line(id_):
 
 
 @line.route("/api/lines/<int:id_>", methods=["DELETE"])
+@auth.login_required
 def delete_line(id_):
     line_to_delete = get_resource_or_404(RecipeLine, id_)
+
+    print(line_to_delete.recipe.creator_id)
 
     if not line_to_delete.recipe.creator_id or hasattr(g, 'user') and g.user.id == line_to_delete.recipe.creator_id:
         db.session.delete(line_to_delete)

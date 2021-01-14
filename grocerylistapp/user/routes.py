@@ -94,6 +94,7 @@ def get_auth_token():
 @user.route("/api/users/refresh-token")
 @auth.login_required
 def get_refresh_token():
+    print(g.user)
     refresh_token = g.user.generate_auth_token(expiration=1209600)  # 14 days
     response = make_response('', 204)
     response.set_cookie('refresh_token', refresh_token, httponly=True)
